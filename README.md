@@ -1,6 +1,6 @@
 ApexPlanet Web Development Internship
 
-Task 3: Development Environment Setup
+Task 4: Development Environment Setup
 
 Tools Used:
 - XAMPP
