@@ -2,25 +2,70 @@
 session_start();
 include "db.php";
 
+$message = "";
+
 if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
 
-    $result = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
-    $user = mysqli_fetch_assoc($result);
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user'] = $username;
-        header("Location: dashboard.php");
+    $stmt = $conn->prepare("SELECT username, password, role FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+
+        $row = $result->fetch_assoc();
+
+        if (password_verify($password, $row['password'])) {
+
+            $_SESSION['user'] = $row['username'];
+            $_SESSION['role'] = $row['role'];
+
+            header("Location: dashboard.php");
+            exit();
+
+        } else {
+            $message = "Invalid password!";
+        }
+
     } else {
-        echo "Invalid login";
+        $message = "User not found!";
     }
 }
 ?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
 <h2>Login</h2>
+
 <form method="POST">
-    <input name="username" placeholder="Username"><br><br>
-    <input type="password" name="password" placeholder="Password"><br><br>
-    <button name="login">Login</button>
+
+    Username:<br>
+    <input type="text" name="username" required>
+    <br><br>
+
+    Password:<br>
+    <input type="password" name="password" required>
+    <br><br>
+
+    <button type="submit" name="login">Login</button>
+
 </form>
+
+<br>
+
+<?php echo $message; ?>
+
+<br><br>
+
+<a href="register.php">New User? Register Here</a>
+
+</body>
+</html>

@@ -2,18 +2,30 @@
 include "db.php";
 
 if (isset($_POST['register'])) {
+
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = "editor";
 
-    mysqli_query($conn, "INSERT INTO users (username, password) VALUES ('$username', '$password')");
+    $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $username, $password, $role);
 
-    echo "Registered successfully!";
+    if ($stmt->execute()) {
+        echo "Registered successfully!";
+    } else {
+        echo "Registration failed!";
+    }
 }
 ?>
 
 <h2>Register</h2>
+
 <form method="POST">
-    <input name="username" placeholder="Username" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button name="register">Register</button>
+    Username:<br>
+    <input type="text" name="username" required><br><br>
+
+    Password:<br>
+    <input type="password" name="password" required><br><br>
+
+    <button type="submit" name="register">Register</button>
 </form>

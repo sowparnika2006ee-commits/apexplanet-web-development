@@ -1,9 +1,11 @@
 <?php
-include "db.php";
+include 'db.php';
 
 $id = $_GET['id'];
 
-mysqli_query($conn, "DELETE FROM posts WHERE id=$id");
+$sql = "DELETE FROM posts WHERE id = '$id'";
 
-header("Location: dashboard.php");
+if(mysqli_query($conn, $sql)){
+    header("Location: dashboard.php");
+}
 ?>
